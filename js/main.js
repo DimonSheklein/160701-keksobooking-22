@@ -1,7 +1,8 @@
 'use strict';
 
 // Функция, возвращающая случайное целое число из переданного диапазона включительно
-const getRandomInteger = (min, max) => {
+const getRandomInteger = (...args) => {
+  let [min, max] = args;
   if (min < 0 || max < 0) {
     throw new Error('диапазон может быть только положительный, включая ноль!')
   }
@@ -37,49 +38,92 @@ try {
   alert(err);
 }
 
+// Массивы
 const TYPE_HOUSING = ['palace', 'flat', 'house', 'bungalow'];
 const FEATURES_HOUSING = ['wifi','dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+const ROOMS = [1, 2, 3, 100];
 const TIME_CHECK_IN_OUT = ['12:00', '13:00', '14:00'];
 const PHOTOS_GALLARY = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
+const TITLES = [
+  'Chill-ZONE',
+  'ICON',
+  'Mirage Hotel',
+  'Golden Rock Beach Hotel',
+  'Dark Side',
+];
+const DESCRIPTIONS = [
+  'Лучший Chill у нас на пляже',
+  'Sex, Drugs, Rok`n`Roll',
+  'Аквадискотека, пилатес, жаренные сосиски',
+  'Молочные коктейли, сауна, тренажрный зал',
+  'Ночные посидели у костра под КиШа',
+];
 
-const getRundomElementArray = (array) => {
-  return array[getRandomInteger(0, array.length - 1)];
+const getRandomElement = (array) => {
+  const index = getRandomInteger(0, array.length - 1);
+  return array[index];
+};
+
+const getSomeArray = (array) => {
+  return array.filter(() => {
+    return getRandomInteger(0, 1);
+  });
 };
 
 // создание объекта для массива
 const getObject = function() {
+  const minPrice = 0;
+  const maxPrice = 1e6;
+  const minGuests = 1;
+  const maxGuests = 200;
+  const minCoordinateX = 35.65000;
+  const maxCoordinateX = 35.70000;
+  const minCoordinateY = 139.70000;
+  const maxCoordinateY = 139.80000;
+  const characters = 5;
+
   const author = {
     avatar: 'img/avatars/user0' + getRandomInteger(1, 8) + '.png',
   };
 
   const location = {
-    x: getCoordinate(35.65000, 35.70000, 5),
-    y: getCoordinate(139.70000, 139.80000, 5),
+    x: getCoordinate(minCoordinateX, maxCoordinateX, characters),
+    y: getCoordinate(minCoordinateY, maxCoordinateY, characters),
   };
 
   const offer = {
-    title: 'Chill-ZONE в центре Припяти',
+    title: getRandomElement(TITLES),
+    description: getRandomElement(DESCRIPTIONS),
     address: Object.values(location).join(', '),
-    price: getRandomInteger(1, 1e6),
-    type: getRundomElementArray(TYPE_HOUSING),
-    rooms: getRandomInteger(1, 100),
-    guests: getRandomInteger(1, 200),
-    checkin: getRundomElementArray(TIME_CHECK_IN_OUT),
-    checkout: getRundomElementArray(TIME_CHECK_IN_OUT),
-    features: FEATURES_HOUSING.filter(() => {return getRandomInteger(0, FEATURES_HOUSING.length - 1)}),
-    description: 'Самое лучшее место для чилла в кругу аномалий и фантомов',
-    photos: PHOTOS_GALLARY.filter(() => {return getRandomInteger(0, PHOTOS_GALLARY.length - 1)}),
+    price: getRandomInteger(minPrice, maxPrice),
+    type: getRandomElement(TYPE_HOUSING),
+    rooms: getRandomElement(ROOMS),
+    guests: getRandomInteger(minGuests, maxGuests),
+    checkin: getRandomElement(TIME_CHECK_IN_OUT),
+    checkout: getRandomElement(TIME_CHECK_IN_OUT),
+    features: getSomeArray(FEATURES_HOUSING),
+    photos: getSomeArray(PHOTOS_GALLARY),
   };
 
-  return Object.assign({}, author, offer, location);
+  return {author, offer, location};
 };
 
 // создание массива из 10 сгенерированных JS-объектов
-const getArray = new Array(10).fill().map(()  => getObject());
+const getArray = function() {
+  let array = [];
 
+  for (let i = 0; i < 10; i++) {
+    array.push(getObject());
+  }
 
-// console.log(getArray);
+  return array;
+};
+
+const fillCards = getArray();
+
+// eslint-disable-next-line no-console
+console.log(fillCards)
