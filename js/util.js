@@ -28,14 +28,6 @@ const getRandomFloatNumber = (min, max, precision) => {
   return getRandomInteger(min * mediator, max * mediator) / mediator;
 };
 
-// Проверка исключений
-try {
-  getRandomInteger();
-  getRandomFloatNumber();
-} catch (err) {
-  alert(err);
-}
-
 // Получаем рандомный эллемент массива
 const getRandomElement = (array) => {
   const index = getRandomInteger(0, array.length - 1);

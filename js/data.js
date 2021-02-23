@@ -1,10 +1,10 @@
 import {getRandomInteger, getRandomFloatNumber, getRandomElement, getSomeArray} from './util.js'
 
-const TYPE_HOUSING = ['palace', 'flat', 'house', 'bungalow'];
-const FEATURES_HOUSING = ['wifi','dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+const HOUSES = ['palace', 'flat', 'house', 'bungalow'];
+const FEATURES = ['wifi','dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 const ROOMS = [1, 2, 3, 100];
-const TIME_TYPE = ['12:00', '13:00', '14:00'];
-const PHOTOS_GALLARY = [
+const TIMES = ['12:00', '13:00', '14:00'];
+const PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
@@ -36,21 +36,19 @@ const Guests = {
   MIN: 1,
   MAX: 200,
 };
-const Coordinate = {
-  X: {
-    MIN: 35.65000,
-    MAX: 35.70000,
-  },
-  Y: {
-    MIN: 139.70000,
-    MAX: 139.80000,
-  },
+const CoordinateX = {
+  MIN: 35.65000,
+  MAX: 35.70000,
+};
+const CoordinateY = {
+  MIN: 139.70000,
+  MAX: 139.80000,
 };
 const CHARACTERS = 5;
 
 // Созданием объект для массива
 const getAd = function() {
-  const registry = getRandomElement(TIME_TYPE);
+  const registry = getRandomElement(TIMES);
   const avatarId = getRandomInteger(AvatarId.MIN, AvatarId.MAX);
 
   // Описание автора
@@ -60,8 +58,8 @@ const getAd = function() {
 
   // Местоположение в виде географических координат
   const location = {
-    x: getRandomFloatNumber(Coordinate.X.MIN, Coordinate.X.MAX, CHARACTERS),
-    y: getRandomFloatNumber(Coordinate.Y.MIN, Coordinate.Y.MAX, CHARACTERS),
+    x: getRandomFloatNumber(CoordinateX.MIN, CoordinateX.MAX, CHARACTERS),
+    y: getRandomFloatNumber(CoordinateY.MIN, CoordinateY.MAX, CHARACTERS),
   };
 
   // Иинформация об объявлении
@@ -70,13 +68,13 @@ const getAd = function() {
     description: getRandomElement(DESCRIPTIONS),
     address: Object.values(location).join(', '),
     price: getRandomInteger(Price.MIN, Price.MAX),
-    type: getRandomElement(TYPE_HOUSING),
+    type: getRandomElement(HOUSES),
     rooms: getRandomElement(ROOMS),
     guests: getRandomInteger(Guests.MIN, Guests.MAX),
     checkin: registry,
     checkout: registry,
-    features: getSomeArray(FEATURES_HOUSING),
-    photos: getSomeArray(PHOTOS_GALLARY),
+    features: getSomeArray(FEATURES),
+    photos: getSomeArray(PHOTOS),
   };
 
   return {author, offer, location};
