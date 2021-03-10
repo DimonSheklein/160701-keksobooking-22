@@ -3,7 +3,6 @@ import {getRandomInteger, getRandomFloatNumber, getRandomElement, getSomeArray} 
 const HOUSES = ['palace', 'flat', 'house', 'bungalow'];
 const FEATURES = ['wifi','dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 const ROOMS = [1, 2, 3, 100];
-const ROOMS_DECLENSIONS = ['комната', 'комнаты', 'комнат'];
 const TIMES = ['12:00', '13:00', '14:00'];
 const PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -93,19 +92,4 @@ const getAds = (n) => {
   return ads;
 };
 
-// const ads = getAds();
-
-// export {ads};
-
-const getDeclination = (count, variants) => {
-  if (count % 10 > 4 && count % 10 < 10 || count % 10 === 0) {
-    return variants[2];
-  } else if (count % 10 > 1 && count % 10 < 5) {
-    return variants[1];
-  } else {
-    return variants[0];
-  }
-};
-
-export {getAds, ADS_COUNT, getDeclination, ROOMS_DECLENSIONS};
-
+export {getAds, ADS_COUNT};
