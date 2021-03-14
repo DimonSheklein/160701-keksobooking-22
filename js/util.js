@@ -42,30 +42,6 @@ const getSomeArray = (array) => {
 };
 
 // Получаем правильное склонение
-
-// const getDeclination = (count, variants) => {
-//   if (count % 10 > 4 && count % 10 < 10 || count % 10 === 0) {
-//     return variants[2];
-//   } else if (count % 10 > 1 && count % 10 < 5) {
-//     return variants[1];
-//   } else {
-//     return variants[0];
-//   }
-// };
-
-// const pluralize = (count, variants) => {
-//   const countAbs =  Math.abs(count) % 100;
-//   const count2 = count % 10;
-//   if (countAbs > 10 && countAbs < 20)
-//     return variants[2];
-//   if (count2 > 1 && count2 < 5)
-//     return variants[1];
-//   if (count2 === 1)
-//     return variants[0];
-
-//   return variants[2];
-// };
-
 const pluralize = (count, variants) => {
   const countAbs1 = Math.abs(count) % 10;
   const countAbs2 = Math.abs(count) % 100;
