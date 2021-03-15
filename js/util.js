@@ -28,14 +28,6 @@ const getRandomFloatNumber = (min, max, precision) => {
   return getRandomInteger(min * mediator, max * mediator) / mediator;
 };
 
-// Проверка исключений
-try {
-  getRandomInteger();
-  getRandomFloatNumber();
-} catch (err) {
-  alert(err);
-}
-
 // Получаем рандомный эллемент массива
 const getRandomElement = (array) => {
   const index = getRandomInteger(0, array.length - 1);
@@ -49,5 +41,19 @@ const getSomeArray = (array) => {
   });
 };
 
+// Получаем правильное склонение
+const pluralize = (count, variants) => {
+  const countAbs1 = Math.abs(count) % 10;
+  const countAbs2 = Math.abs(count) % 100;
 
-export {getRandomInteger, getRandomFloatNumber, getRandomElement, getSomeArray};
+  if (countAbs1 > 4 && countAbs1 < 10 || countAbs1 === 0 || countAbs2 === 11) {
+    return variants[2];
+  } else if (countAbs1 > 1 && countAbs1 < 5) {
+    return variants[1];
+  }
+
+  return variants[0];
+};
+
+
+export {getRandomInteger, getRandomFloatNumber, getRandomElement, getSomeArray, pluralize};
