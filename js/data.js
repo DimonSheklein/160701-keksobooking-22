@@ -26,6 +26,13 @@ const DESCRIPTIONS = [
 const CHARACTERS = 5;
 const ADS_COUNT = 10;
 
+const HouseTypesByMinPrices = {
+  bungalow: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000,
+
+}
 const Price = {
   MIN: 0,
   MAX: 1e6,
@@ -92,4 +99,4 @@ const getAds = (n) => {
   return ads;
 };
 
-export {getAds, ADS_COUNT};
+export {getAds, ADS_COUNT, HouseTypesByMinPrices};
