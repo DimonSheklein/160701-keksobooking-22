@@ -1,7 +1,19 @@
-import {getRandomInteger, getRandomFloatNumber, getRandomElement, getSomeArray} from './util.js'
+import {
+  getRandomInteger,
+  getRandomFloatNumber,
+  getRandomElement,
+  getSomeArray
+} from './util.js';
 
 const HOUSES = ['palace', 'flat', 'house', 'bungalow'];
-const FEATURES = ['wifi','dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+const FEATURES = [
+  'wifi',
+  'dishwasher',
+  'parking',
+  'washer',
+  'elevator',
+  'conditioner',
+];
 const ROOMS = [1, 2, 3, 100];
 const TIMES = ['12:00', '13:00', '14:00'];
 const PHOTOS = [
@@ -26,13 +38,6 @@ const DESCRIPTIONS = [
 const CHARACTERS = 5;
 const ADS_COUNT = 10;
 
-const HouseTypesByMinPrices = {
-  bungalow: 0,
-  flat: 1000,
-  house: 5000,
-  palace: 10000,
-
-}
 const Price = {
   MIN: 0,
   MAX: 1e6,
@@ -46,12 +51,12 @@ const Guests = {
   MAX: 200,
 };
 const CoordinateX = {
-  MIN: 35.65000,
-  MAX: 35.70000,
+  MIN: 35.65,
+  MAX: 35.7,
 };
 const CoordinateY = {
-  MIN: 139.70000,
-  MAX: 139.80000,
+  MIN: 139.7,
+  MAX: 139.8,
 };
 
 // Создаем объект для массива
@@ -85,7 +90,7 @@ const getAd = () => {
     photos: getSomeArray(PHOTOS),
   };
 
-  return {author, offer, location};
+  return { author, offer, location };
 };
 
 // Генерируем массив из 10 объектов
@@ -99,4 +104,4 @@ const getAds = (n) => {
   return ads;
 };
 
-export {getAds, ADS_COUNT, HouseTypesByMinPrices};
+export { getAds, ADS_COUNT };
