@@ -1,15 +1,3 @@
-import {
-  FORM,
-  FORM_ELEMENTS,
-  MAP_FILTERS,
-  FILTERS_SELECTS,
-  FEATURES_CHECKBOXES,
-  ADDRESS_INPUT
-} from './form.js';
-import { getNodeState } from './util.js';
-import { getAds, ADS_COUNT } from './data.js';
-import { renderCard } from './card.js';
-
 // Константы
 const MAP_CONTAINER = document.querySelector('#map-canvas');
 const MAP = L.map(MAP_CONTAINER);
@@ -33,97 +21,67 @@ const STANDARD_PIN_ICON = L.icon({
 });
 
 const URL_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const COPYRIGHT_LAYER =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const COPYRIGHT_LAYER = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-const ads = getAds(ADS_COUNT);
 
-// const coordData = ads.map((obj, index) => {
-//   return {
-//     lat: obj.location.x,
-//     lng: obj.location.y,
-//     id: index,
-//   };
-// });
+/* ----------------- инициализация карты ---------------- */
 
-// eslint-disable-next-line no-console
-// console.log(ads);
-// console.log(renderCard())
+const showMap = (activeState) => {
+  // центрируем карту, указав координаты и зум
+  MAP.setView(DEAFULT_COORDINATE, ZOOM);
+  // создаём и добавляем слой на карту
+  L.tileLayer(URL_LAYER, { attribution: COPYRIGHT_LAYER }).addTo(MAP);
+  // перевод формы в активное состояние после загрузки карты
+  MAP.on('load', activeState);
+}
 
-/* ------------------------------------------------------ */
-// активное состояние карты
-const activeStateMap = () => {
-  FORM.classList.remove('ad-form--disabled');
-  MAP_FILTERS.classList.remove('map__filters--disabled');
-  getNodeState(FORM_ELEMENTS, 0);
-  getNodeState(FILTERS_SELECTS, 0);
-  getNodeState(FEATURES_CHECKBOXES, 0);
+/* -------------- отрисовка главного балуна ------------- */
 
-  ADDRESS_INPUT.value = Object.values(DEAFULT_COORDINATE).join(', ');
-};
-
-// центрируем карту, указав координаты и зум
-MAP.setView(DEAFULT_COORDINATE, ZOOM);
-// создаём и добавляем слой на карту
-L.tileLayer(URL_LAYER, { attribution: COPYRIGHT_LAYER }).addTo(MAP);
-
-MAP.on('load', activeStateMap());
-
-/* -------------------- главный балун ------------------- */
-
-const mainPinmarker = L.marker(DEAFULT_COORDINATE, {
-  draggable: true,
-  icon: MAIN_PIN_ICON,
-});
-
-mainPinmarker.addTo(MAP);
-
-mainPinmarker.on('move', (evt) => {
-  const coordinate = evt.target.getLatLng();
-
-  let valCoord = Object.values(coordinate).map((value) => {
-    return value.toFixed(5);
+const renderMainPin = (pinMoveHandler) => {
+  // добавляем пин на карту
+  const mainPin = L.marker(DEAFULT_COORDINATE, {
+    draggable: true,
+    icon: MAIN_PIN_ICON,
   });
 
-  ADDRESS_INPUT.value = valCoord.join(', ')
-});
+  mainPin.addTo(MAP);
+
+  /* ------------------------------------------------------ */
+
+  // коллбэк получения координат
+  const getCoords = (evt) => {
+    pinMoveHandler(evt.target.getLatLng());
+  };
+  // обработчик получения координат
+  mainPin.on('move', getCoords);
+}
 
 /* ----------------- стандартные балуны ----------------- */
 
-// coordData.forEach(({ lat, lng, id }) => {
-//   const marker = L.marker(
-//     {
-//       lat,
-//       lng,
-//     },
-//     {
-//       icon: STANDARD_PIN_ICON,
-//       draggable: false,
-//     },
-//   );
+// добавляем стандартные балуны на карту
+const addPins = (pinsData, getPopup) =>  {
+  pinsData.forEach(( { lat, lng, id}) => {
+    const marker = L.marker(
+      {
+        lat,
+        lng,
+      },
+      {
+        icon: STANDARD_PIN_ICON,
+      },
+    );
 
-//   marker.addTo(MAP);
-//   marker.bindPopup(id.toString());
-// });
+    marker.addTo(MAP);
 
-ads.forEach((ad) => {
-  const { x: lat, y: lng } = ad.location;
+    // открытие карточек объявлений по клику на пин
+    marker.bindPopup(
+      getPopup(id),
+      {
+        keepInView: true,
+      },
+    );
+  });
+}
 
-  const marker = L.marker(
-    {
-      lat,
-      lng,
-    },
-    {
-      icon: STANDARD_PIN_ICON,
-    },
-  );
-
-  marker.addTo(MAP);
-  marker.bindPopup(
-    renderCard(ad),
-    {
-      keepInView: true,
-    },
-  );
-});
+/* ----------------------- exports ---------------------- */
+export {DEAFULT_COORDINATE, showMap, renderMainPin, addPins};

@@ -21,7 +21,18 @@ const HouseTypesByMinPrices = {
 const priceSelectedHouse = HouseTypesByMinPrices[HOUSE_TYPE_SELECT.value];
 
 /* ------------------------------------------------------ */
-ADDRESS_INPUT.setAttribute('readonly', true);
+// активное состояние формы
+const activeStateForm = (coordinates) => {
+  FORM.classList.remove('ad-form--disabled');
+  MAP_FILTERS.classList.remove('map__filters--disabled');
+  getNodeState(FORM_ELEMENTS, 0);
+  getNodeState(FILTERS_SELECTS, 0);
+  getNodeState(FEATURES_CHECKBOXES, 0);
+
+  ADDRESS_INPUT.value = Object.values(coordinates).join(', ');
+  ADDRESS_INPUT.setAttribute('readonly', true);
+};
+
 
 // устанавливаем минимальную цену выбранного типа жилья
 HOUSE_PRICE_SELECT.setAttribute('placeholder', priceSelectedHouse);
@@ -73,12 +84,18 @@ getNodeState(FORM_ELEMENTS, 1);
 getNodeState(FILTERS_SELECTS, 1);
 getNodeState(FEATURES_CHECKBOXES, 1);
 
+// Получаем значение координат из объекта и транслируем их в поле формы "Адрес"
+const addCoords = (coords) => {
+  const valCoords = Object.values(coords).map((value) => {
+    return value.toFixed(5);
+  });
+
+  ADDRESS_INPUT.value = valCoords.join(', ');
+}
+
 export {
   addFormHandlers,
-  FORM,
-  FORM_ELEMENTS,
-  MAP_FILTERS,
-  FILTERS_SELECTS,
-  FEATURES_CHECKBOXES,
+  activeStateForm,
+  addCoords,
   ADDRESS_INPUT
 };

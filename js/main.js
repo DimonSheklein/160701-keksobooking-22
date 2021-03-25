@@ -1,13 +1,29 @@
-// import {getAds, ADS_COUNT} from './data.js';
-// import {renderCard} from './card.js';
-import {addFormHandlers} from './form.js';
-import './form.js';
-import './map.js';
+import {renderCard} from './card.js';
+import {getAds, ADS_COUNT} from './data.js';
+import {addFormHandlers, activeStateForm, addCoords} from './form.js';
+import {DEAFULT_COORDINATE, showMap, renderMainPin, addPins} from './map.js';
 
-// const MAP_NODE = document.querySelector('#map-canvas')
-// const ads = getAds(ADS_COUNT);
+const ads = getAds(ADS_COUNT);
 
-// const adElement = renderCard(ads[1]);
-// MAP_NODE.appendChild(adElement);
+const adsData = ads.map((key, index) => {
+  return {
+    lat: key.location.x,
+    lng: key.location.y,
+    id: index,
+  };
+})
 
+const activeForm = activeStateForm(DEAFULT_COORDINATE);
+
+const pinMoveHandler = (coords) => {
+  return addCoords(coords);
+}
+
+const getPopup = (index) => {
+  return renderCard(ads[index])
+}
+
+showMap(activeForm);
+renderMainPin(pinMoveHandler);
+addPins(adsData, getPopup);
 addFormHandlers();
