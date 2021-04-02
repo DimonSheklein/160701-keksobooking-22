@@ -36,8 +36,14 @@ const showMap = (activeState) => {
 }
 
 /* -------------- отрисовка главного балуна ------------- */
+/* ------------------------------------------------------ */
 
-const renderMainPin = (pinMoveHandler) => {
+// обработчик получения координат
+// const getCoords = (evt) => {
+//   evt.target.getLatLng();
+// };
+
+const renderMainPin = () => {
   // добавляем пин на карту
   const mainPin = L.marker(DEAFULT_COORDINATE, {
     draggable: true,
@@ -46,21 +52,17 @@ const renderMainPin = (pinMoveHandler) => {
 
   mainPin.addTo(MAP);
 
-  /* ------------------------------------------------------ */
-
-  // коллбэк получения координат
-  const getCoords = (evt) => {
-    pinMoveHandler(evt.target.getLatLng());
-  };
-  // обработчик получения координат
-  mainPin.on('move', getCoords);
+  // событие получения координат
+  mainPin.on('move', (evt) => {
+    evt.target.getLatLng();
+  });
 }
 
 /* ----------------- стандартные балуны ----------------- */
 
 // добавляем стандартные балуны на карту
 const addPins = (pinsData, getPopup) =>  {
-  pinsData.forEach(( { lat, lng, id}) => {
+  pinsData.forEach(( { lat, lng} , idx) => {
     const marker = L.marker(
       {
         lat,
@@ -75,7 +77,7 @@ const addPins = (pinsData, getPopup) =>  {
 
     // открытие карточек объявлений по клику на пин
     marker.bindPopup(
-      getPopup(id),
+      getPopup(idx),
       {
         keepInView: true,
       },

@@ -11,12 +11,15 @@ const HOUSE_TYPE_SELECT = FORM.querySelector('#type');
 const HOUSE_PRICE = FORM.querySelector('#price');
 const ROOM_NUMBER = FORM.querySelector('#room_number');
 const CAPACITY = FORM.querySelector('#capacity');
+const CAPACITY_OPTIONS = CAPACITY.querySelectorAll('option');
 const TIME_IN_SELECT = FORM.querySelector('#timein');
 const TIME_OUT_SELECT = FORM.querySelector('#timeout');
 const ADDRESS_INPUT = document.querySelector('#address');
+const FORM_SUBMIT = FORM.querySelector('.ad-form__submit');
 
 const MIN_LENGTH_TITLE = '30';
 const MAX_LENGTH_TITLE = '100';
+const MAX_ROOMS_COUNT = 100;
 
 const HouseTypesByMinPrices = {
   bungalow: 0,
@@ -25,6 +28,8 @@ const HouseTypesByMinPrices = {
   palace: 10000,
 };
 const priceSelectedHouse = HouseTypesByMinPrices[HOUSE_TYPE_SELECT.value];
+
+const lastCapacityOption = CAPACITY_OPTIONS[CAPACITY_OPTIONS.length - 1]
 
 /* ------------------------------------------------------ */
 // активное состояние формы
@@ -112,41 +117,44 @@ const priceValidationHandler = () => {
 }
 
 // обработчик проверки на валидацию поля "Количество мест"
-const capacityValidationHandler = () => {
-  let errMsg = '';
+const capacityValidationHandler = (evt) => {
+  const roomValue = Number(evt.target.value);
 
-  const roomValue = parseInt(ROOM_NUMBER.value);
-  const capacityValue = parseInt(CAPACITY.value);
+  if (roomValue === MAX_ROOMS_COUNT) {
+    getNodeState(CAPACITY_OPTIONS, 1);
 
-  if (roomValue === 1 && capacityValue !== 1) {
-    errMsg = 'Выбранное количество комнат предназначено для 1 гостя';
-  }  else if (roomValue === 2 && (capacityValue > 2 || capacityValue === 0)) {
-    errMsg = 'Выбранное количество комнат предназначено для 1-2 гостей';
-  } else if (roomValue === 3 && (capacityValue > 3 || capacityValue === 0)) {
-    errMsg = 'Выбранное количество комнат предназначено для 1-3 гостей';
-  } else if (roomValue === 100 && capacityValue !== 0) {
-    errMsg = 'Выбранное количество комнат не предназначено для гостей';
+    lastCapacityOption.disabled = 0;
+    lastCapacityOption.selected = 1;
+  } else {
+    getNodeState(CAPACITY_OPTIONS, 0);
+
+    lastCapacityOption.disabled = 1;
+
+    CAPACITY_OPTIONS.forEach((option) => {
+      if (roomValue < option.value) {
+        option.disabled = true;
+      }
+    })
+
+    CAPACITY.value = roomValue;
   }
-
-  CAPACITY.reportValidity();
-
-  return CAPACITY.setCustomValidity(errMsg);
 }
 
 /* ------------------------------------------------------ */
-const getValiditeForm = (inputNode) => {
-  FORM.addEventListener('submit', (evt) => {
-    if (inputNode.validity.valid) {
-      inputNode.setAttribute('style', 'border: 1px solid red;')
-      evt.preventDefault();
-    } else {
-      inputNode.setAttribute('style', 'border: none;')
-    }
-  })
-}
+// const getValiditeForm = () => {
+//   for () {
+//     if ( ) {
+//       FORM_SUBMIT.disabled = 1;
+//       FORM.setAttribute('style', 'border: 1px solid red;')
+//     } else {
+//       FORM_SUBMIT.disabled = 0;
+//       FORM.setAttribute('style', 'border: none;')
+//     }
+//     FORM.reportValidity;
 
-getValiditeForm(TITLE);
-getValiditeForm(HOUSE_PRICE);
+//   }
+
+// }
 
 // Вызов событий
 const addFormHandlers = () => {
@@ -156,7 +164,9 @@ const addFormHandlers = () => {
 
   addEvent('input', TITLE, titleValidationHandler);
   addEvent('input', HOUSE_PRICE, priceValidationHandler);
-  addEvent('change', CAPACITY, capacityValidationHandler);
+  addEvent('change', ROOM_NUMBER, capacityValidationHandler);
+
+  // addEvent('submit', FORM, getValiditeForm)
 };
 
 // Перевод страницы в неактивное состояние
@@ -176,7 +186,7 @@ const addCoords = (coords) => {
   ADDRESS_INPUT.value = valCoords.join(', ');
 }
 
-console.log(TITLE.validity)
+console.log(TITLE.classList)
 
 export {
   addFormHandlers,

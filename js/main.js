@@ -5,13 +5,10 @@ import {DEAFULT_COORDINATE, showMap, renderMainPin, addPins} from './map.js';
 
 const ads = getAds(ADS_COUNT);
 
-const adsData = ads.map((key, index) => {
-  return {
-    lat: key.location.x,
-    lng: key.location.y,
-    id: index,
-  };
-})
+const coords = ads.map((key) => ({
+  lat: key.location.x,
+  lng: key.location.y,
+}))
 
 const activeForm = activeStateForm(DEAFULT_COORDINATE);
 
@@ -19,11 +16,11 @@ const pinMoveHandler = (coords) => {
   return addCoords(coords);
 }
 
-const getPopup = (index) => {
-  return renderCard(ads[index])
+const getPopup = (idx) => {
+  return renderCard(ads[idx])
 }
 
 showMap(activeForm);
 renderMainPin(pinMoveHandler);
-addPins(adsData, getPopup);
+addPins(coords, getPopup);
 addFormHandlers();
