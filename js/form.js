@@ -15,7 +15,7 @@ const CAPACITY_OPTIONS = CAPACITY.querySelectorAll('option');
 const TIME_IN_SELECT = FORM.querySelector('#timein');
 const TIME_OUT_SELECT = FORM.querySelector('#timeout');
 const ADDRESS_INPUT = document.querySelector('#address');
-const FORM_SUBMIT = FORM.querySelector('.ad-form__submit');
+// const FORM_SUBMIT = FORM.querySelector('.ad-form__submit');
 
 const MIN_LENGTH_TITLE = '30';
 const MAX_LENGTH_TITLE = '100';
@@ -29,7 +29,10 @@ const HouseTypesByMinPrices = {
 };
 const priceSelectedHouse = HouseTypesByMinPrices[HOUSE_TYPE_SELECT.value];
 
-const lastCapacityOption = CAPACITY_OPTIONS[CAPACITY_OPTIONS.length - 1]
+const lastCapacityOption = CAPACITY_OPTIONS[CAPACITY_OPTIONS.length - 1];
+
+// Устанавливаем количество мест, соответствующее количеству комнат
+CAPACITY.value = ROOM_NUMBER.value;
 
 /* ------------------------------------------------------ */
 // активное состояние формы
@@ -141,19 +144,12 @@ const capacityValidationHandler = (evt) => {
 }
 
 /* ------------------------------------------------------ */
-// const getValiditeForm = () => {
-//   for () {
-//     if ( ) {
-//       FORM_SUBMIT.disabled = 1;
-//       FORM.setAttribute('style', 'border: 1px solid red;')
-//     } else {
-//       FORM_SUBMIT.disabled = 0;
-//       FORM.setAttribute('style', 'border: none;')
-//     }
-//     FORM.reportValidity;
-
+// const getValiditeForm = (evt) => {
+//   if (!TITLE.validity.valid || !HOUSE_PRICE.validity.valid || !CAPACITY.validity.valid) {
+//     FORM_SUBMIT.disabled = true;
+//     evt.preventDefault();
 //   }
-
+//   FORM_SUBMIT.disabled = false;
 // }
 
 // Вызов событий
@@ -166,7 +162,7 @@ const addFormHandlers = () => {
   addEvent('input', HOUSE_PRICE, priceValidationHandler);
   addEvent('change', ROOM_NUMBER, capacityValidationHandler);
 
-  // addEvent('submit', FORM, getValiditeForm)
+  // addEvent('submit', FORM, getValiditeForm)''
 };
 
 // Перевод страницы в неактивное состояние
@@ -185,8 +181,6 @@ const addCoords = (coords) => {
 
   ADDRESS_INPUT.value = valCoords.join(', ');
 }
-
-console.log(TITLE.classList)
 
 export {
   addFormHandlers,
