@@ -1,26 +1,35 @@
 import {renderCard} from './card.js';
-import {getAds, ADS_COUNT} from './data.js';
-import {addFormHandlers, activeStateForm, addCoords} from './form.js';
-import {DEAFULT_COORDINATE, showMap, renderMainPin, addPins} from './map.js';
+import {setAddress, enableForms} from './form.js';
+import {initMap, addPins} from './map.js';
+import {loadData} from './api.js';
 
-const ads = getAds(ADS_COUNT);
+const adaptPoint = (ad) => ({
+  lat: ad.location.x,
+  lng: ad.location.y,
+});
 
-const coords = ads.map((key) => ({
-  lat: key.location.x,
-  lng: key.location.y,
-}))
+const dataPromise = loadData();
 
-const activeForm = activeStateForm(DEAFULT_COORDINATE);
+const renderPins = (data) => {
+  const coords = data.map(adaptPoint);
+  const getPopup = (idx) => renderCard(data[idx]);
 
-const pinMoveHandler = (coords) => {
-  return addCoords(coords);
+  addPins(coords, getPopup);
 }
 
-const getPopup = (idx) => {
-  return renderCard(ads[idx])
+const handleDataSuccess = () => {
+  const data = loadData();
+  // console.log('handleDataSuccess:', data);
+  renderPins(data)
 }
 
-showMap(activeForm);
-renderMainPin(pinMoveHandler);
-addPins(coords, getPopup);
-addFormHandlers();
+  const handleMapLoadSuccess = () => {
+  enableForms();
+
+  dataPromise
+  .then(handleDataSuccess)
+  .then(console.log('hello'))
+  .catch(alert('WTF???'))
+  }
+
+initMap(handleMapLoadSuccess, setAddress);

@@ -1,4 +1,4 @@
-import { addEvent, addDisabledModification, getNodeState } from './util.js';
+import { addEventListener, getNodeState } from './util.js';
 
 const FORM = document.querySelector('.ad-form');
 const FORM_ELEMENTS = FORM.querySelectorAll('.ad-form__element');
@@ -35,17 +35,20 @@ const lastCapacityOption = CAPACITY_OPTIONS[CAPACITY_OPTIONS.length - 1];
 CAPACITY.value = ROOM_NUMBER.value;
 
 /* ------------------------------------------------------ */
-// активное состояние формы
-const activeStateForm = (coordinates) => {
-  FORM.classList.remove('ad-form--disabled');
-  MAP_FILTERS.classList.remove('map__filters--disabled');
-  getNodeState(FORM_ELEMENTS, 0);
-  getNodeState(FILTERS_SELECTS, 0);
-  getNodeState(FEATURES_CHECKBOXES, 0);
-
-  ADDRESS_INPUT.value = Object.values(coordinates).join(', ');
+// Получаем значение координат из объекта и транслируем их в поле формы "Адрес"
+// устанавливаем координаты в поле "Адрес"
+const setAddress = coordinates => {
+  ADDRESS_INPUT.value = Object.values(coordinates).map(value => value.toFixed(5)).join(', ');
   ADDRESS_INPUT.setAttribute('readonly', true);
 };
+
+// const addCoords = coords => {
+//   const valCoords = Object.values(coords).map(value => {
+//     return value.toFixed(5);
+//   });
+
+//   ADDRESS_INPUT.value = valCoords.join(', ');
+// };
 
 
 // устанавливаем минимальную цену выбранного типа жилья
@@ -56,7 +59,7 @@ HOUSE_PRICE.setAttribute('min', priceSelectedHouse);
  * Функция подставляет минимальную цену в атрибуты min и placeholder в поле "Цена за ночь, руб."
  * @param {*} minPrice - сюда будет отправляться значение цены по ключу из перечисления HouseTypesByMinPrices
  */
-const updatePrice = (minPrice) => {
+const updatePrice = minPrice => {
   HOUSE_PRICE.setAttribute('placeholder', minPrice);
   HOUSE_PRICE.setAttribute('min', minPrice);
 };
@@ -66,7 +69,7 @@ const updatePrice = (minPrice) => {
  * @param {*} evt - целевое значение value ноды HOUSE_TYPE_SELECT
  * @returns - минимальная цена для соответствующих значений функции updatePrice
  */
-const getPriceByTypeHandler = (evt) => {
+const getPriceByTypeHandler = evt => {
   const houseType = evt.target.value;
   const minPrice = HouseTypesByMinPrices[houseType];
 
@@ -74,12 +77,12 @@ const getPriceByTypeHandler = (evt) => {
 };
 
 // Обработчик получения времени заезда по времени выезда
-const getTimeInHandler = (evt) => {
+const getTimeInHandler = evt => {
   TIME_IN_SELECT.value = evt.target.value;
 };
 
 // Обработчик получения времени выезда по времени заезда
-const getTimeOutHandler = (evt) => {
+const getTimeOutHandler = evt => {
   TIME_OUT_SELECT.value = evt.target.value;
 };
 
@@ -90,24 +93,28 @@ const titleValidationHandler = () => {
   let errMsg = '';
 
   if (TITLE.validity.valueMissing) {
-    errMsg = 'Поле должно быть заполнено!'
+    errMsg = 'Поле должно быть заполнено!';
   } else if (TITLE.validity.tooShort) {
-    errMsg = `Длина поля не должна быть меньше ${TITLE.minLength} символов. Добавьте ещё ${(MIN_LENGTH_TITLE - valueLength)} симв.`;
+    errMsg = `Длина поля не должна быть меньше ${
+      TITLE.minLength
+    } символов. Добавьте ещё ${MIN_LENGTH_TITLE - valueLength} симв.`;
   } else if (TITLE.validity.tooLong) {
-    errMsg = `Длина поля не должна превышать ${TITLE.maxLength} символов. Удалите ${(valueLength - MAX_LENGTH_TITLE)} симв.`;
+    errMsg = `Длина поля не должна превышать ${
+      TITLE.maxLength
+    } символов. Удалите ${valueLength - MAX_LENGTH_TITLE} симв.`;
   }
 
   TITLE.reportValidity();
 
   return TITLE.setCustomValidity(errMsg);
-}
+};
 
 // обработчик проверки на валидацию поля "Цена за ночь"
 const priceValidationHandler = () => {
   let errMsg = '';
 
   if (HOUSE_PRICE.validity.valueMissing) {
-    errMsg = 'Укажите цену за ночь!'
+    errMsg = 'Укажите цену за ночь!';
   } else if (HOUSE_PRICE.validity.rangeUnderflow) {
     errMsg = `Цена за ночь не должна быть меньше ${HOUSE_PRICE.min} RUB.`;
   } else if (HOUSE_PRICE.validity.rangeOverflow) {
@@ -117,10 +124,10 @@ const priceValidationHandler = () => {
   HOUSE_PRICE.reportValidity();
 
   return HOUSE_PRICE.setCustomValidity(errMsg);
-}
+};
 
 // обработчик проверки на валидацию поля "Количество мест"
-const capacityValidationHandler = (evt) => {
+const capacityValidationHandler = evt => {
   const roomValue = Number(evt.target.value);
 
   if (roomValue === MAX_ROOMS_COUNT) {
@@ -133,15 +140,15 @@ const capacityValidationHandler = (evt) => {
 
     lastCapacityOption.disabled = 1;
 
-    CAPACITY_OPTIONS.forEach((option) => {
+    CAPACITY_OPTIONS.forEach(option => {
       if (roomValue < option.value) {
         option.disabled = true;
       }
-    })
+    });
 
     CAPACITY.value = roomValue;
   }
-}
+};
 
 /* ------------------------------------------------------ */
 // const getValiditeForm = (evt) => {
@@ -154,37 +161,33 @@ const capacityValidationHandler = (evt) => {
 
 // Вызов событий
 const addFormHandlers = () => {
-  addEvent('change', HOUSE_TYPE_SELECT, getPriceByTypeHandler);
-  addEvent('change', TIME_IN_SELECT, getTimeInHandler);
-  addEvent('change', TIME_IN_SELECT, getTimeOutHandler);
+  addEventListener('change', HOUSE_TYPE_SELECT, getPriceByTypeHandler);
+  addEventListener('change', TIME_IN_SELECT, getTimeInHandler);
+  addEventListener('change', TIME_IN_SELECT, getTimeOutHandler);
 
-  addEvent('input', TITLE, titleValidationHandler);
-  addEvent('input', HOUSE_PRICE, priceValidationHandler);
-  addEvent('change', ROOM_NUMBER, capacityValidationHandler);
+  addEventListener('input', TITLE, titleValidationHandler);
+  addEventListener('input', HOUSE_PRICE, priceValidationHandler);
+  addEventListener('change', ROOM_NUMBER, capacityValidationHandler);
 
-  // addEvent('submit', FORM, getValiditeForm)''
+  // addEventListener('submit', FORM, getValiditeForm)''
 };
 
-// Перевод страницы в неактивное состояние
-addDisabledModification(FORM);
-addDisabledModification(MAP_FILTERS);
-
-getNodeState(FORM_ELEMENTS, 1);
-getNodeState(FILTERS_SELECTS, 1);
-getNodeState(FEATURES_CHECKBOXES, 1);
-
-// Получаем значение координат из объекта и транслируем их в поле формы "Адрес"
-const addCoords = (coords) => {
-  const valCoords = Object.values(coords).map((value) => {
-    return value.toFixed(5);
-  });
-
-  ADDRESS_INPUT.value = valCoords.join(', ');
+const disableFormFields = (node, field) => {
+  node.classLIst.add(`${node.className}--disabled`);
+  let children = node.querySelectorAll(field);
+  children.forEach((elem) => elem.setAttribute('disabled', ''));
 }
 
-export {
-  addFormHandlers,
-  activeStateForm,
-  addCoords,
-  ADDRESS_INPUT
-};
+const enableFormFields = (node, field) => {
+  node.classList.remove(`${node.className}--disabled`);
+  const children = node.querySelectorAll(field);
+  children.forEach((elem) => elem.removeAttribute('disabled'));
+}
+
+const enableForms = () => {
+  enableFormFields(FORM, 'ad-form__element');
+  enableFormFields(MAP_FILTERS, 'select');
+  addFormHandlers();
+}
+
+export { setAddress, ADDRESS_INPUT, disableFormFields, enableForms};

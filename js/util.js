@@ -56,13 +56,13 @@ const pluralize = (count, variants) => {
 };
 
 // Функция добавления события
-const addEvent = (type, eventNode, callback) => {
+const addEventListener = (type, eventNode, callback) => {
   eventNode.addEventListener(type, callback);
 }
 
-const addDisabledModification = (node) => {
-  node.classList.add(`${node.className}--disabled`);
-};
+// const addDisabledModification = (node) => {
+//   node.classList.add(`${node.className}--disabled`);
+// };
 const getNodeState = (collection, bulevo) => {
   for (let element of collection) {
     element.disabled = bulevo;
@@ -75,7 +75,6 @@ export {
   getRandomElement,
   getSomeArray,
   pluralize,
-  addEvent,
-  addDisabledModification,
+  addEventListener,
   getNodeState
 };

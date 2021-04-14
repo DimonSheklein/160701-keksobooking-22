@@ -23,67 +23,78 @@ const STANDARD_PIN_ICON = L.icon({
 const URL_LAYER = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const COPYRIGHT_LAYER = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-
-/* ----------------- инициализация карты ---------------- */
-
-const showMap = (activeState) => {
-  // центрируем карту, указав координаты и зум
-  MAP.setView(DEAFULT_COORDINATE, ZOOM);
-  // создаём и добавляем слой на карту
-  L.tileLayer(URL_LAYER, { attribution: COPYRIGHT_LAYER }).addTo(MAP);
-  // перевод формы в активное состояние после загрузки карты
-  MAP.on('load', activeState);
-}
-
-/* -------------- отрисовка главного балуна ------------- */
-/* ------------------------------------------------------ */
-
-// обработчик получения координат
-// const getCoords = (evt) => {
-//   evt.target.getLatLng();
-// };
-
-const renderMainPin = () => {
-  // добавляем пин на карту
-  const mainPin = L.marker(DEAFULT_COORDINATE, {
-    draggable: true,
-    icon: MAIN_PIN_ICON,
-  });
-
-  mainPin.addTo(MAP);
-
-  // событие получения координат
-  mainPin.on('move', (evt) => {
-    evt.target.getLatLng();
-  });
-}
-
 /* ----------------- стандартные балуны ----------------- */
 
 // добавляем стандартные балуны на карту
-const addPins = (pinsData, getPopup) =>  {
-  pinsData.forEach(( { lat, lng} , idx) => {
-    const marker = L.marker(
-      {
-        lat,
-        lng,
-      },
-      {
-        icon: STANDARD_PIN_ICON,
-      },
+// const addPins = (pinsData, getPopup) =>  {
+//   pinsData.forEach(( { lat, lng} , idx) => {
+//     const marker = L.marker(
+//       {
+//         lat,
+//         lng,
+//       },
+//       {
+//         icon: STANDARD_PIN_ICON,
+//       },
+//     );
+
+//     marker.addTo(MAP);
+
+//     // открытие карточек объявлений по клику на пин
+//     marker.bindPopup(
+//       getPopup(idx),
+//       {
+//         keepInView: true,
+//       },
+//     );
+//   });
+// }
+
+const addPins = (points, getPopup) =>  {
+  const addPin = ( { lat, lng} , idx) =>{
+    const marker = L.marker({lat, lng}, {STANDARD_PIN_ICON});
+
+    marker.bindPopup(
+      () => getPopup(idx),
+      {keepInView: true},
     );
 
     marker.addTo(MAP);
+  };
 
-    // открытие карточек объявлений по клику на пин
-    marker.bindPopup(
-      getPopup(idx),
-      {
-        keepInView: true,
-      },
-    );
-  });
+  points.forEach(addPin);
 }
 
+/* ----------------- Инициализация карты ---------------- */
+
+const initMap = (onLoad, onPinMove) => {
+  const showMap = (activeState) => {
+    // центрируем карту, указав координаты и зум
+    MAP.setView(DEAFULT_COORDINATE, ZOOM);
+    // создаём и добавляем слой на карту
+    L.tileLayer(URL_LAYER, { attribution: COPYRIGHT_LAYER }).addTo(MAP);
+    // перевод формы в активное состояние после загрузки карты
+    MAP.on('load', activeState);
+  }
+
+  const renderMainPin = () => {
+    // добавляем пин на карту
+    const mainPin = L.marker(DEAFULT_COORDINATE, {
+      draggable: true,
+      icon: MAIN_PIN_ICON,
+    });
+
+    mainPin.addTo(MAP);
+
+    // событие получения координат
+    mainPin.on('move', (evt) => {
+      onPinMove(evt.target.getLatLng());
+    });
+  }
+
+  showMap(onLoad);
+  renderMainPin();
+  onPinMove(DEAFULT_COORDINATE);
+}
 /* ----------------------- exports ---------------------- */
-export {DEAFULT_COORDINATE, showMap, renderMainPin, addPins};
+export {DEAFULT_COORDINATE, initMap, addPins};
