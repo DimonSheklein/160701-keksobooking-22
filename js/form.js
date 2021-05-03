@@ -1,12 +1,15 @@
+import { DEAFULT_COORDINATE } from './map.js';
 import { addEventListener, getNodeState } from './util.js';
+import { postFormData } from './api.js';
+import { openSuccessPopup, openErrorPopup } from './popup.js';
 
 const FORM = document.querySelector('.ad-form');
-const FORM_ELEMENTS = FORM.querySelectorAll('.ad-form__element');
+// const FORM_ELEMENTS = FORM.querySelectorAll('.ad-form__element');
 const TITLE = FORM.querySelector('#title');
 const MAP_FILTERS = document.querySelector('.map__filters');
-const FILTERS_SELECTS = MAP_FILTERS.querySelectorAll('.map__filter');
-const MAP_FEATURES = MAP_FILTERS.querySelector('.map__features');
-const FEATURES_CHECKBOXES = MAP_FEATURES.querySelectorAll('.map__checkbox');
+// const FILTERS_SELECTS = MAP_FILTERS.querySelectorAll('.map__filter');
+// const MAP_FEATURES = MAP_FILTERS.querySelector('.map__features');
+// const FEATURES_CHECKBOXES = MAP_FEATURES.querySelectorAll('.map__checkbox');
 const HOUSE_TYPE_SELECT = FORM.querySelector('#type');
 const HOUSE_PRICE = FORM.querySelector('#price');
 const ROOM_NUMBER = FORM.querySelector('#room_number');
@@ -16,6 +19,7 @@ const TIME_IN_SELECT = FORM.querySelector('#timein');
 const TIME_OUT_SELECT = FORM.querySelector('#timeout');
 const ADDRESS_INPUT = document.querySelector('#address');
 // const FORM_SUBMIT = FORM.querySelector('.ad-form__submit');
+const FORM_RESET = FORM.querySelector('.ad-form__reset');
 
 const MIN_LENGTH_TITLE = '30';
 const MAX_LENGTH_TITLE = '100';
@@ -37,7 +41,7 @@ CAPACITY.value = ROOM_NUMBER.value;
 /* ------------------------------------------------------ */
 // Получаем значение координат из объекта и транслируем их в поле формы "Адрес"
 // устанавливаем координаты в поле "Адрес"
-const setAddress = coordinates => {
+const setAddress = (coordinates) => {
   ADDRESS_INPUT.value = Object.values(coordinates).map(value => value.toFixed(5)).join(', ');
   ADDRESS_INPUT.setAttribute('readonly', true);
 };
@@ -77,13 +81,35 @@ const getPriceByTypeHandler = evt => {
 };
 
 // Обработчик получения времени заезда по времени выезда
-const getTimeInHandler = evt => {
-  TIME_IN_SELECT.value = evt.target.value;
-};
+const getTimeInHandler = evt => TIME_IN_SELECT.value = evt.target.value;
 
 // Обработчик получения времени выезда по времени заезда
-const getTimeOutHandler = evt => {
-  TIME_OUT_SELECT.value = evt.target.value;
+const getTimeOutHandler = evt => TIME_OUT_SELECT.value = evt.target.value;
+
+// Обработчик очистки формы
+const getResetFormHandler = (evt) => {
+  evt.preventDefault();
+  FORM.reset();
+  setAddress(DEAFULT_COORDINATE);
+};
+
+// Обработчик отправки формы
+const getSubmitFormHandler = (evt) => {
+  evt.preventDefault();
+
+  const formData = new FormData(evt.target);
+  const dataPromise = postFormData(formData);
+
+  dataPromise
+    .then(() => {
+      openSuccessPopup();
+      getResetFormHandler(evt);
+    })
+    .catch(openErrorPopup())
+    // .catch(error => {
+    //   console.error(error);
+    //   openErrorPopup();
+    // });
 };
 
 /* ---------------------- ВАЛИДАЦИЯ --------------------- */
@@ -169,17 +195,35 @@ const addFormHandlers = () => {
   addEventListener('input', HOUSE_PRICE, priceValidationHandler);
   addEventListener('change', ROOM_NUMBER, capacityValidationHandler);
 
+  addEventListener('submit', FORM, getSubmitFormHandler);
+  addEventListener('click', FORM_RESET, getResetFormHandler);
+
   // addEventListener('submit', FORM, getValiditeForm)''
 };
 
+const removeFormHandlers = () => {
+  removeEventListener('change', HOUSE_TYPE_SELECT, getPriceByTypeHandler);
+  removeEventListener('change', TIME_IN_SELECT, getTimeInHandler);
+  removeEventListener('change', TIME_IN_SELECT, getTimeOutHandler);
+
+  removeEventListener('input', TITLE, titleValidationHandler);
+  removeEventListener('input', HOUSE_PRICE, priceValidationHandler);
+  removeEventListener('change', ROOM_NUMBER, capacityValidationHandler);
+
+  removeEventListener('submit', FORM, getSubmitFormHandler);
+  removeEventListener('click', FORM_RESET, getResetFormHandler);
+
+  // removeEventListener('submit', FORM, getValiditeForm)
+};
+
 const disableFormFields = (node, field) => {
-  node.classLIst.add(`${node.className}--disabled`);
+  node.classList.add(`${node.className}--disabled`);
   let children = node.querySelectorAll(field);
   children.forEach((elem) => elem.setAttribute('disabled', ''));
 }
 
 const enableFormFields = (node, field) => {
-  node.classList.remove(`${node.className}--disabled`);
+  node.classList.remove(`${node.classList[0]}--disabled`);
   const children = node.querySelectorAll(field);
   children.forEach((elem) => elem.removeAttribute('disabled'));
 }
@@ -190,4 +234,10 @@ const enableForms = () => {
   addFormHandlers();
 }
 
-export { setAddress, ADDRESS_INPUT, disableFormFields, enableForms};
+const disabledForms = () => {
+  disableFormFields(FORM, 'ad-form__element');
+  disableFormFields(MAP_FILTERS, 'select');
+  removeFormHandlers();
+}
+
+export { setAddress, ADDRESS_INPUT, disableFormFields, enableForms, disabledForms};
